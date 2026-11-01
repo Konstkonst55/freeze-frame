@@ -1,20 +1,28 @@
 #include "ui/employees_tab.h"
-#include "ui/theme.h"
 #include "ui/dialogs.h"
+#include "ui/theme.h"
+
 #include <FL/fl_ask.H>
 
+#include <cctype>
+#include <exception>
+#include <string>
+#include <vector>
+
 namespace {
-    template<typename F> void runSafely(F&& f) {
+
+    template <typename F>
+    void runSafely(F&& function) {
         try {
-            f();
-        } catch (std::exception& e) {
-            fl_alert("Ошибка: %s", e.what());
+            function();
+        } catch (std::exception& error) {
+            fl_alert("Ошибка: %s", error.what());
         }
     }
+
 }
 
-EmployeesTab::EmployeesTab(int X, int Y, int W, int H, Service& svc)
-    : Fl_Group(X, Y, W, H), svc_(svc) {
+EmployeesTab::EmployeesTab(int X, int Y, int W, int H, Service& svc) : Fl_Group(X, Y, W, H), svc_(svc) {
     box(FL_FLAT_BOX);
     color(Theme::bg);
 
@@ -37,13 +45,8 @@ EmployeesTab::EmployeesTab(int X, int Y, int W, int H, Service& svc)
 
     table_ = new DataTable(0, 0, 100, 100);
     table_->setup({"ID", "ФИО", "Email", "Статус"}, {1, 5, 5, 2});
-    table_->setBadgeColumn(3, {
-        {"В штате", Theme::success},
-        {"Уволен",  Theme::textMuted}
-    });
-    table_->onActivate([this](long id) {
-        doEdit(id);
-    });
+    table_->setBadgeColumn(3, {{"В штате", Theme::success}, {"Уволен", Theme::textMuted}});
+    table_->onActivate([this](long id) { doEdit(id); });
 
     end();
     layout();
@@ -53,27 +56,31 @@ EmployeesTab::EmployeesTab(int X, int Y, int W, int H, Service& svc)
 void EmployeesTab::layout() {
     const int pad = Theme::PAD;
     const int gap = Theme::GAP;
-    const int bh  = Theme::BTN_H;
-    const int bw  = Theme::BTN_W;
+    const int buttonHeight = Theme::BTN_H;
+    const int buttonWidth = Theme::BTN_W;
 
     int rightEdge = x() + w() - pad;
-    addBtn_->resize(rightEdge - bw, y() + pad, bw, bh);
-    editBtn_->resize(rightEdge - bw - gap - bw, y() + pad, bw, bh);
+    addBtn_->resize(rightEdge - buttonWidth, y() + pad, buttonWidth, buttonHeight);
+    editBtn_->resize(rightEdge - buttonWidth - gap - buttonWidth, y() + pad, buttonWidth, buttonHeight);
 
     int searchX = x() + pad + 60 + 8;
-    int searchW = editBtn_->x() - gap - searchX;
-    if (searchW < 120) {
-        searchW = 120;
-    }
-    searchLabel_->resize(x() + pad, y() + pad, 60, bh);
-    search_->resize(searchX, y() + pad, searchW, bh);
+    int searchWidth = editBtn_->x() - gap - searchX;
 
-    int tableY = y() + pad + bh + 16;
-    int tableH = h() - (tableY - y()) - pad;
-    if (tableH < 80) {
-        tableH = 80;
+    if (searchWidth < 120) {
+        searchWidth = 120;
     }
-    table_->resize(x() + pad, tableY, w() - 2 * pad, tableH);
+
+    searchLabel_->resize(x() + pad, y() + pad, 60, buttonHeight);
+    search_->resize(searchX, y() + pad, searchWidth, buttonHeight);
+
+    int tableY = y() + pad + buttonHeight + 16;
+    int tableHeight = h() - (tableY - y()) - pad;
+
+    if (tableHeight < 80) {
+        tableHeight = 80;
+    }
+
+    table_->resize(x() + pad, tableY, w() - 2 * pad, tableHeight);
 }
 
 void EmployeesTab::resize(int X, int Y, int W, int H) {
@@ -83,83 +90,102 @@ void EmployeesTab::resize(int X, int Y, int W, int H) {
 
 void EmployeesTab::reload() {
     runSafely([&] {
-        std::string f = search_->value();
+        std::string filter = search_->value();
         std::vector<std::vector<std::string>> data;
         std::vector<long> ids;
-        for (const auto& e : svc_.employees()) {
-            if (!f.empty()) {
-                auto lower = [](std::string s) {
-                    for (auto& c : s) {
-                        c = (char)tolower(c);
+
+        for (const auto& employee : svc_.employees()) {
+            if (!filter.empty()) {
+                auto lower = [](std::string value) {
+                    for (auto& character : value) {
+                        character = (char)tolower(character);
                     }
-                    return s;
+
+                    return value;
                 };
-                if (lower(e.fullName()).find(lower(f)) == std::string::npos &&
-                lower(e.email()).find(lower(f)) == std::string::npos)
-                continue;
+
+                if (lower(employee.fullName()).find(lower(filter)) == std::string::npos
+                    && lower(employee.email()).find(lower(filter)) == std::string::npos) {
+                    continue;
+                }
             }
-            data.push_back({
-                std::to_string(e.id()),
-                e.fullName(),
-                e.email(),
-                e.isActive() ? "В штате" : "Уволен"
-            });
-            ids.push_back(e.id());
+
+            data.push_back(
+                    {std::to_string(employee.id()),
+                     employee.fullName(),
+                     employee.email(),
+                     employee.isActive() ? "В штате" : "Уволен"});
+            ids.push_back(employee.id());
         }
+
         table_->setRows(data, ids);
     });
 }
 
 void EmployeesTab::doAdd() {
-    auto* d = new EmployeeDialog([this](auto name, auto email, auto) {
+    auto* dialog = new EmployeeDialog([this](auto name, auto email, auto) {
         runSafely([&] {
             svc_.addEmployee(name, email);
             reload();
         });
     });
-    d->show();
-    while (d->shown()) {
+
+    dialog->show();
+
+    while (dialog->shown()) {
         Fl::wait();
     }
-    delete d;
+
+    delete dialog;
 }
 
 void EmployeesTab::doEdit(long id) {
     runSafely([&] {
-        for (const auto& e : svc_.employees()) {
-            if (e.id() != id) {
+        for (const auto& employee : svc_.employees()) {
+            if (employee.id() != id) {
                 continue;
             }
-            auto* d = new EmployeeDialog(
-            [this, id](auto name, auto email, auto active) {
-                runSafely([&] {
-                    svc_.updateEmployee(id, name, email, active);
-                    reload();
-                });
-            },
-            id, e.fullName(), e.email(), e.isActive());
-            d->show();
-            while (d->shown()) {
+
+            auto* dialog = new EmployeeDialog(
+                    [this, id](auto name, auto email, auto active) {
+                        runSafely([&] {
+                            svc_.updateEmployee(id, name, email, active);
+                            reload();
+                        });
+                    },
+                    id,
+                    employee.fullName(),
+                    employee.email(),
+                    employee.isActive());
+
+            dialog->show();
+
+            while (dialog->shown()) {
                 Fl::wait();
             }
-            delete d;
+
+            delete dialog;
             return;
         }
     });
 }
 
 void EmployeesTab::searchCb(Fl_Widget*, void* v) {
-    ((EmployeesTab*)v)->reload();
+    static_cast<EmployeesTab*>(v)->reload();
 }
+
 void EmployeesTab::addCb(Fl_Widget*, void* v) {
-    ((EmployeesTab*)v)->doAdd();
+    static_cast<EmployeesTab*>(v)->doAdd();
 }
+
 void EmployeesTab::editCb(Fl_Widget*, void* v) {
-    auto* t = (EmployeesTab*)v;
-    long id = t->table_->selectedId();
+    auto* tab = static_cast<EmployeesTab*>(v);
+    long id = tab->table_->selectedId();
+
     if (id < 0) {
         fl_alert("Выберите строку");
         return;
     }
-    t->doEdit(id);
+
+    tab->doEdit(id);
 }

@@ -19,6 +19,9 @@ public:
     std::time_t issuedAt() const {
         return issuedAt_;
     }
+    std::time_t returnedAt() const {
+        return returnedAt_.null() ? 0 : returnedAt_.get();
+    }
     bool isActive() const {
         return returnedAt_.null();
     }
@@ -39,18 +42,18 @@ public:
 private:
     friend class odb::access;
 
-    #pragma db id auto
+#pragma db id auto
     long id_ = 0;
 
-    #pragma db not_null column("asset_id")
+#pragma db not_null column("asset_id")
     long assetId_ = 0;
 
-    #pragma db not_null column("employee_id")
+#pragma db not_null column("employee_id")
     long employeeId_ = 0;
 
-    #pragma db not_null column("issued_at")
+#pragma db not_null column("issued_at")
     std::time_t issuedAt_ = 0;
 
-    #pragma db null column("returned_at")
+#pragma db null column("returned_at")
     odb::nullable<std::time_t> returnedAt_;
 };
