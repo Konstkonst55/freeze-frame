@@ -3,70 +3,72 @@
 namespace Theme {
 
     Fl_Button* primary(int x, int y, int w, int h, const char* label) {
-        auto b = new Fl_Button(x, y, w, h, label);
-        b->box(FL_RFLAT_BOX);
-        b->down_box(FL_RFLAT_BOX);
-        b->color(accent);
-        b->selection_color(accentHover);
-        b->labelcolor(FL_WHITE);
-        b->labelfont(fontBold);
-        b->labelsize(13);
-        return b;
+        auto button = new Fl_Button(x, y, w, h, label);
+        button->box(FL_RFLAT_BOX);
+        button->down_box(FL_RFLAT_BOX);
+        button->color(accent);
+        button->selection_color(accentHover);
+        button->labelcolor(FL_WHITE);
+        button->labelfont(fontBold);
+        button->labelsize(13);
+        return button;
     }
 
     Fl_Button* secondary(int x, int y, int w, int h, const char* label) {
-        auto b = new Fl_Button(x, y, w, h, label);
-        b->box(FL_RFLAT_BOX);
-        b->down_box(FL_RFLAT_BOX);
-        b->color(surface);
-        b->selection_color(rowSelected);
-        b->labelcolor(textPrimary);
-        b->labelfont(font);
-        b->labelsize(13);
-        return b;
+        auto button = new Fl_Button(x, y, w, h, label);
+        button->box(FL_RFLAT_BOX);
+        button->down_box(FL_RFLAT_BOX);
+        button->color(surface);
+        button->selection_color(rowSelected);
+        button->labelcolor(textPrimary);
+        button->labelfont(font);
+        button->labelsize(13);
+        return button;
     }
 
     Fl_Button* dangerBtn(int x, int y, int w, int h, const char* label) {
-        auto b = secondary(x, y, w, h, label);
-        b->labelcolor(danger);
-        return b;
+        auto button = secondary(x, y, w, h, label);
+        button->labelcolor(danger);
+        return button;
     }
 
     Fl_Button* returnButton(int x, int y, int w, int h, const char* label) {
-        auto b = new Fl_Return_Button(x, y, w, h, label);
-        b->box(FL_RFLAT_BOX);
-        b->down_box(FL_RFLAT_BOX);
-        b->color(accent);
-        b->selection_color(accentHover);
-        b->labelcolor(FL_WHITE);
-        b->labelfont(fontBold);
-        b->labelsize(13);
-        return b;
+        auto button = new Fl_Return_Button(x, y, w, h, label);
+        button->box(FL_RFLAT_BOX);
+        button->down_box(FL_RFLAT_BOX);
+        button->color(accent);
+        button->selection_color(accentHover);
+        button->labelcolor(FL_WHITE);
+        button->labelfont(fontBold);
+        button->labelsize(13);
+        return button;
     }
 
     Fl_Input* input(int x, int y, int w, int h, const char* def) {
-        auto i = new Fl_Input(x, y, w, h);
-        i->box(FL_DOWN_BOX);
-        i->color(surface);
-        i->selection_color(rowSelected);
-        i->textcolor(textPrimary);
-        i->textfont(font);
-        i->textsize(13);
+        auto widget = new Fl_Input(x, y, w, h);
+        widget->box(FL_DOWN_BOX);
+        widget->color(surface);
+        widget->selection_color(rowSelected);
+        widget->textcolor(textPrimary);
+        widget->textfont(font);
+        widget->textsize(13);
+
         if (def && *def) {
-            i->value(def);
+            widget->value(def);
         }
-        return i;
+
+        return widget;
     }
 
     Fl_Box* fieldLabel(int x, int y, int w, const char* text) {
-        auto b = new Fl_Box(x, y, w, 16);
-        b->box(FL_NO_BOX);
-        b->labelcolor(textMuted);
-        b->labelfont(fontBold);
-        b->labelsize(11);
-        b->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-        b->label(text);
-        return b;
+        auto box = new Fl_Box(x, y, w, 16);
+        box->box(FL_NO_BOX);
+        box->labelcolor(textMuted);
+        box->labelfont(fontBold);
+        box->labelsize(11);
+        box->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+        box->label(text);
+        return box;
     }
 
 }

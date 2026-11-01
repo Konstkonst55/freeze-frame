@@ -1,8 +1,8 @@
 #pragma once
-#include <FL/Fl_Double_Window.H>
+#include "service.h"
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
-#include "service.h"
+#include <FL/Fl_Double_Window.H>
 
 class EmployeesTab;
 class AssetsTab;
@@ -17,7 +17,7 @@ private:
     Fl_Box *header_, *brand_, *status_;
     Fl_Button *tabEmp_, *tabAst_;
     EmployeesTab* empTab_;
-    AssetsTab*    astTab_;
+    AssetsTab* astTab_;
 
     void layout();
     void switchTab(int idx);

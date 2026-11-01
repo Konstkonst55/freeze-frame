@@ -2,8 +2,9 @@
 #include "ui/main_window.h"
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
-#include <odb/pgsql/database.hxx>
 #include <cstdlib>
+#include <exception>
+#include <odb/pgsql/database.hxx>
 #include <string>
 
 int main(int argc, char** argv) {
@@ -14,18 +15,16 @@ int main(int argc, char** argv) {
         };
 
         odb::pgsql::database db(
-            env("EQDB_NAME", "equipment_tracker"),
-            env("EQDB_USER", "postgres"),
-            env("EQDB_PASS", "postgres"),
-            env("EQDB_HOST", "localhost"),
-            5432);
+                env("EQDB_NAME", "equipment_tracker"),
+                env("EQDB_USER", "postgres"),
+                env("EQDB_PASS", "postgres"),
+                env("EQDB_HOST", "localhost"),
+                5432);
 
         Service svc(db);
 
         auto* win = new MainWindow(svc);
-        win->callback([](Fl_Widget* w, void*) {
-            w->hide();
-        });
+        win->callback([](Fl_Widget* w, void*) { w->hide(); });
         win->show(argc, argv);
         int ret = Fl::run();
         delete win;

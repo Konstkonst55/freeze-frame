@@ -1,10 +1,10 @@
 #pragma once
+#include "service.h"
+#include "ui/data_table.h"
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Input.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Box.H>
-#include "ui/data_table.h"
-#include "service.h"
 
 class EmployeesTab : public Fl_Group {
 public:
@@ -14,7 +14,7 @@ public:
 
 private:
     Service& svc_;
-    Fl_Box*   searchLabel_;
+    Fl_Box* searchLabel_;
     Fl_Input* search_;
     Fl_Button *addBtn_, *editBtn_;
     DataTable* table_;

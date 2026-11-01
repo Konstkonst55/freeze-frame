@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <odb/core.hxx>
+#include <string>
 
 #pragma db object table("assets")
 class Asset {
@@ -38,18 +38,18 @@ public:
 private:
     friend class odb::access;
 
-    #pragma db id auto
+#pragma db id auto
     long id_ = 0;
 
-    #pragma db not_null unique column("inventory_number")
+#pragma db not_null unique column("inventory_number")
     std::string inventoryNumber_;
 
-    #pragma db not_null column("model")
+#pragma db not_null column("model")
     std::string model_;
 
-    #pragma db not_null column("category")
+#pragma db not_null column("category")
     std::string category_;
 
-    #pragma db not_null column("assigned")
+#pragma db not_null column("assigned")
     bool assigned_ = false;
 };

@@ -1,10 +1,9 @@
 #include "ui/main_window.h"
-#include "ui/theme.h"
-#include "ui/employees_tab.h"
 #include "ui/assets_tab.h"
+#include "ui/employees_tab.h"
+#include "ui/theme.h"
 
-MainWindow::MainWindow(Service& svc)
-    : Fl_Double_Window(1200, 760, "Стоп-кадр — учёт техники студии"), svc_(svc) {
+MainWindow::MainWindow(Service& svc) : Fl_Double_Window(1200, 760, "Стоп-кадр — учёт техники студии"), svc_(svc) {
     color(Theme::bg);
     size_range(900, 600);
 
@@ -41,11 +40,10 @@ MainWindow::MainWindow(Service& svc)
     int contentH = h() - Theme::HEADER - Theme::STATUS;
 
     empTab_ = new EmployeesTab(0, contentY, w(), contentH, svc_);
-    astTab_ = new AssetsTab   (0, contentY, w(), contentH, svc_);
+    astTab_ = new AssetsTab(0, contentY, w(), contentH, svc_);
     astTab_->hide();
 
-    status_ = new Fl_Box(0, h() - Theme::STATUS, w(), Theme::STATUS,
-        "Готово   ·   PostgreSQL");
+    status_ = new Fl_Box(0, h() - Theme::STATUS, w(), Theme::STATUS, "Готово   ·   PostgreSQL");
     status_->box(FL_FLAT_BOX);
     status_->color(Theme::surface);
     status_->labelcolor(Theme::textMuted);
@@ -100,8 +98,9 @@ void MainWindow::switchTab(int idx) {
 }
 
 void MainWindow::tabEmpCb(Fl_Widget*, void* v) {
-    ((MainWindow*)v)->switchTab(0);
+    static_cast<MainWindow*>(v)->switchTab(0);
 }
+
 void MainWindow::tabAstCb(Fl_Widget*, void* v) {
-    ((MainWindow*)v)->switchTab(1);
+    static_cast<MainWindow*>(v)->switchTab(1);
 }
